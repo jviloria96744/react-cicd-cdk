@@ -30,7 +30,7 @@ jobs:
         run: npm test
         env:
           CI: true
-      - name: Test Environment Variable
+      - name: Test Environment Variables
         run: echo $ENVIRONMENT
       # - name: Package Front-End
       #   run: npm run build
