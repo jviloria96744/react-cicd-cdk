@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: "14.x"
       - name: Install jq to parse outputs of cdk deploy
-        run: apt-get install jq
+        run: sudo apt-get install jq
       - name: Install Dependencies
         if: "!env.TESTING"
         run: npm install
