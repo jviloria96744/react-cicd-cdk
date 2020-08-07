@@ -40,7 +40,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Install AWS CDK
-        run: npm install -g aws-cdk
+        run: npm install -g aws-cdk@1.56.0
       - uses: actions/setup-python@v2
         with:
           python-version: "3.8"
