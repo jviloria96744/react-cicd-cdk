@@ -15,10 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set env to dev
-        if: (endsWith(github.ref, 'feature/**') || endsWith(github.ref, '/master'))
+        if: (contains(github.ref, 'feature') || contains(github.ref, 'master'))
         run: echo "::set-env name=ENVIRONMENT::dev"
       - name: Set env to stg
-        if: endsWith(github.ref, 'release')
+        if: contains(github.ref, 'release')
         run: echo "::set-env name=ENVIRONMENT::stg"
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v2-beta
