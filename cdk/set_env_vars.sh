@@ -1,8 +1,8 @@
 #!/bin/bash
 
 export FILE=cdk-deploy-output.json
-echo "::set-env name=STACK::$(jq keys_unsorted[] $FILE)"
-export STACK=$(jq keys_unsorted[] $FILE) 
+export STACK=$(jq keys_unsorted[] $FILE)
+echo "::set-env name=STACK::$STACK" 
 
 function remove_quotes {
     echo $1 | tr -d '"'

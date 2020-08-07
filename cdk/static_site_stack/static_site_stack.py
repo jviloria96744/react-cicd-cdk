@@ -6,16 +6,17 @@ from aws_cdk import (
     core
 )
 
-#certificate_arn = "arn:aws:acm:us-east-1:667206377715:certificate/62206b2f-d963-4ce2-841a-37a6d8705ab4"
-
 
 class StaticSiteStack(core.Stack):
 
     def __init__(self, scope: core.Construct, id: str, environment: str, domain: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
+        # I created the certificate before hand and pass it in as a context variable
+        # This can also be created as a separate stack and stored in the parameter store
         self.certificate_arn = self.node.try_get_context("certificate_arn")
 
+        # This is the bucket that will be used to store the artifacts for prod (and stg) deployments
         artifact_bucket = s3.Bucket(self,
                                     f"react-cicd-cdk-artifacts",
                                     removal_policy=core.RemovalPolicy.DESTROY,
@@ -47,6 +48,8 @@ class StaticSiteStack(core.Stack):
             security_policy=cf.SecurityPolicyProtocol.TLS_V1_1_2016
         )
 
+        # config dictionary for CloudFront distributions, no caching takes place in dev
+        # The assumption is that it will be changed frequently and those changes will be tested
         cf_behavior_dict = {
             "dev": cf.Behavior(is_default_behavior=True, min_ttl=core.Duration.seconds(0), max_ttl=core.Duration.seconds(0), default_ttl=core.Duration.seconds(0)),
             "stg": cf.Behavior(is_default_behavior=True),

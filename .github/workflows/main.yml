@@ -26,7 +26,7 @@ jobs:
         with:
           node-version: "14.x"
       - name: Install jq to parse outputs of cdk deploy
-        run: sudo apt-get install jq
+        run: sudo apt install jq
       - name: Install Dependencies
         run: npm install
       - name: Run Front-End Tests
@@ -47,13 +47,17 @@ jobs:
       - name: Install CDK Requirements
         run: cd cdk && pip3 install -r requirements.txt
       - name: Synthesize Cloud Formation Template
-        run: cd cdk && cdk ls -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }}
+        env:
+          DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
+          CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
+        run: cd cdk && cdk ls -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN"
       - name: Deploy Stack
-        run: cd cdk && cdk deploy -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }} --require-approval "never" --outputs-file cdk-deploy-output.json
+        env:
+          DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
+          CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
+        run: cd cdk && cdk deploy -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
       - name: Set Output Variables
-        run: cd cdk && bash ./set_env_vars.sh
-      - name: View Output Variables
-        run: echo $BUCKET && echo $DIST_ID && echo $ARTIFACT_BUCKET
+        run: cd cdk && bash ./set_env_vars.sh && echo $BUCKET && echo $DIST_ID && echo $ARTIFACT_BUCKET
       - name: Build Deployment Package
         run: npm run build
       - name: Deploy To S3 Bucket
