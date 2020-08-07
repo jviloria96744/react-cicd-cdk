@@ -16,6 +16,8 @@ jobs:
       TESTING: ${{ true }}
     runs-on: ubuntu-latest
     steps:
+      - name: Test TESTING Variable
+        run: echo ${{env.TESTING}}
       - name: Set env to dev
         if: (contains(github.ref, 'feature') || contains(github.ref, 'master'))
         run: echo "::set-env name=ENVIRONMENT::dev"
@@ -27,10 +29,10 @@ jobs:
         with:
           node-version: "14.x"
       - name: Install Dependencies
-        if: env.TESTING != true
+        if: "!env.TESTING"
         run: npm install
       - name: Run Front-End Tests
-        if: env.TESTING != true
+        if: "!env.TESTING"
         run: npm test
         env:
           CI: true
