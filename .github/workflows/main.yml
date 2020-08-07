@@ -12,7 +12,6 @@ on:
       - ".github/workflows/main.yml"
 jobs:
   build:
-    env:
     runs-on: ubuntu-latest
     steps:
       - name: Set env variable
