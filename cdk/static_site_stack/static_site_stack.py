@@ -32,7 +32,7 @@ class StaticSiteStack(core.Stack):
                            block_public_access=s3.BlockPublicAccess.BLOCK_ALL
                            )
 
-        core.CfnOutput(self, f"{environment}bucketname",
+        core.CfnOutput(self, f"sitebucketname",
                        value=bucket.bucket_name)
 
         oai = cf.OriginAccessIdentity(

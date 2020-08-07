@@ -56,4 +56,4 @@ jobs:
       - name: Set output variables
         run: cd cdk && bash ./set_env_vars.sh
       - name: Read Output Variables
-        run: cd cdk && echo $STACK && echo $STACK2
+        run: cd cdk && echo $STACK && echo $DIST_ID && echo $BUCKET
