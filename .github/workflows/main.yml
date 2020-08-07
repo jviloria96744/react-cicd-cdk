@@ -8,6 +8,7 @@ on:
     paths:
       - "cdk/static_site_stack/**"
       - "cdk/app.py"
+      - "cdk/set_env_vars.sh"
       - "src/**"
       - ".github/workflows/main.yml"
 jobs:
