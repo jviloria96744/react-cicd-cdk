@@ -28,12 +28,12 @@ jobs:
           node-version: "14.x"
       - name: Install Dependencies
         run: npm install
-        if: $TESTING
+        if: env.TESTING
       - name: Run Front-End Tests
         run: npm test
         env:
           CI: true
-        if: $TESTING
+        if: env.TESTING
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
