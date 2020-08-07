@@ -52,10 +52,12 @@ jobs:
         run: cd cdk && cdk deploy -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }} --require-approval "never" --outputs-file cdk-deploy-output.json
       - name: Set Output Variables
         run: cd cdk && bash ./set_env_vars.sh
+      - name: View Output Variables
+        run: echo "$BUCKET" | tr -d '"' && echo echo "$DIST_ID" | tr -d '"' && echo "$ARTIFACT_BUCKET" | tr -d '"'
       - name: Build Deployment Package
         run: npm run build
       - name: Deploy To S3 Bucket
-        run: aws s3 sync ./build s3://$BUCKET --delete
+        run: aws s3 sync ./build s3://$(echo "$BUCKET" | tr -d '"') --delete
       - name: Invalidate CloudFront Cache (stg & prod Environments)
         if: env.ENVIRONMENT == 'stg'
         run: aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
