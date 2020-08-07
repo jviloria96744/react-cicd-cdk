@@ -13,8 +13,6 @@ on:
       - ".github/workflows/main.yml"
 jobs:
   build:
-    env:
-      TESTING: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       - name: Set env to dev
@@ -30,10 +28,8 @@ jobs:
       - name: Install jq to parse outputs of cdk deploy
         run: sudo apt-get install jq
       - name: Install Dependencies
-        if: "!env.TESTING"
         run: npm install
       - name: Run Front-End Tests
-        if: "!env.TESTING"
         run: npm test
         env:
           CI: true
