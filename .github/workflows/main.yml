@@ -53,11 +53,11 @@ jobs:
       - name: Set Output Variables
         run: cd cdk && bash ./set_env_vars.sh
       - name: View Output Variables
-        run: echo "$BUCKET" | tr -d '"' && echo "$DIST_ID" | tr -d '"' && echo "$ARTIFACT_BUCKET" | tr -d '"'
+        run: echo $BUCKET && echo $DIST_ID && echo $ARTIFACT_BUCKET
       - name: Build Deployment Package
         run: npm run build
       - name: Deploy To S3 Bucket
-        run: aws s3 sync ./build s3://$(echo "$BUCKET" | tr -d '"') --delete
+        run: aws s3 sync ./build s3://$BUCKET --delete
       - name: Invalidate CloudFront Cache (stg & prod Environments)
         if: env.ENVIRONMENT == 'stg'
         run: aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
