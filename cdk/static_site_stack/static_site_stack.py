@@ -17,18 +17,23 @@ class StaticSiteStack(core.Stack):
         self.domain = domain
         super().__init__(scope, id, **kwargs)
 
-        bucket = s3.Bucket(self, 
-            f"{env}bucket", 
-            bucket_name=f"{env}.{domain}", 
-            website_index_document="index.html", 
-            removal_policy=core.RemovalPolicy.DESTROY, 
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL
-        )
+        artifact_bucket = s3.Bucket(self,
+                                    f"react-cicd-cdk-artifacts",
+                                    removal_policy=core.RemovalPolicy.DESTROY,
+                                    block_public_access=s3.BlockPublicAccess.BLOCK_ALL
+                                    )
+
+        bucket = s3.Bucket(self,
+                           f"{env}bucket",
+                           bucket_name=f"{env}.{domain}",
+                           website_index_document="index.html",
+                           removal_policy=core.RemovalPolicy.DESTROY,
+                           block_public_access=s3.BlockPublicAccess.BLOCK_ALL
+                           )
 
         core.CfnOutput(self, f"{env}bucketname", value=bucket.bucket_name)
         core.CfnOutput(self, f"{env}bucketsite",
                        value=bucket.bucket_website_url)
-
 
         oai = cf.OriginAccessIdentity(
             self,
@@ -79,6 +84,7 @@ class StaticSiteStack(core.Stack):
             self,
             'static-site-alias-record',
             record_name=f"{env}.{domain}",
-            target=route53.AddressRecordTarget.from_alias(targets.CloudFrontTarget(cf_dist)),
+            target=route53.AddressRecordTarget.from_alias(
+                targets.CloudFrontTarget(cf_dist)),
             zone=hosted_zone
         )
