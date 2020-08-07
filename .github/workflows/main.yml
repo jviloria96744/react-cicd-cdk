@@ -44,4 +44,5 @@ jobs:
       - name: Install CDK Requirements
         run: cd cdk && pip3 install -r requirements.txt
       - name: Synthesize Cloud Formation Template
-        run: cdk ls -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c hosted_zone_id=${{ secrets.AWS_HOSTED_ID }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }}
+        run: ls
+        # run: cdk ls -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c hosted_zone_id=${{ secrets.AWS_HOSTED_ID }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }}
