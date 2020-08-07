@@ -15,6 +15,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Test IF.Else statement
+        run: echo $(if contains(github.ref, 'master') then echo "dev" else echo "not dev" fi)
       - name: Set env to dev
         if: (contains(github.ref, 'feature') || contains(github.ref, 'master'))
         run: echo "::set-env name=ENVIRONMENT::dev"
@@ -57,7 +59,9 @@ jobs:
           CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
         run: cd cdk && cdk deploy -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
       - name: Set Output Variables
-        run: cd cdk && bash ./set_env_vars.sh && echo $BUCKET && echo $DIST_ID && echo $ARTIFACT_BUCKET
+        run: cd cdk && bash ./set_env_vars.sh &&
+      - name: Log Output Variables
+        run: echo $BUCKET && echo $DIST_ID && echo $ARTIFACT_BUCKET
       - name: Build Deployment Package
         run: npm run build
       - name: Deploy To S3 Bucket
