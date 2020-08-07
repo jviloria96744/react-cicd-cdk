@@ -22,7 +22,7 @@ class StaticSiteStack(core.Stack):
                                     block_public_access=s3.BlockPublicAccess.BLOCK_ALL
                                     )
 
-        core.CfnOutput(self, "artifact-bucket-name",
+        core.CfnOutput(self, "artifactbucketname",
                        value=artifact_bucket.bucket_name)
 
         bucket = s3.Bucket(self,
@@ -69,7 +69,7 @@ class StaticSiteStack(core.Stack):
             viewer_protocol_policy=cf.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
         )
 
-        core.CfnOutput(self, "dist_id", value=cf_dist.distribution_id)
+        core.CfnOutput(self, "distid", value=cf_dist.distribution_id)
 
         # Route53 alias record for the CloudFront Distribution
         hosted_zone = route53.HostedZone.from_lookup(
