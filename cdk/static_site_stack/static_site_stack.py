@@ -6,19 +6,21 @@ from aws_cdk import (
     core
 )
 
-certificate_arn = "arn:aws:acm:us-east-1:667206377715:certificate/62206b2f-d963-4ce2-841a-37a6d8705ab4"
-hosted_zone_id = "Z05672093954N8JIZRDO5"
+#certificate_arn = "arn:aws:acm:us-east-1:667206377715:certificate/62206b2f-d963-4ce2-841a-37a6d8705ab4"
+#hosted_zone_id = "Z05672093954N8JIZRDO5"
 
 
 class StaticSiteStack(core.Stack):
 
     def __init__(self, scope: core.Construct, id: str, env: str, domain: str, **kwargs) -> None:
-        self.env = env
-        self.domain = domain
         super().__init__(scope, id, **kwargs)
+
+        self.hosted_zone_id = self.node.try_get_context("hosted_zone_id")
+        self.certificate_arn = self.node.try_get_context("certificate_arn")
 
         artifact_bucket = s3.Bucket(self,
                                     f"react-cicd-cdk-artifacts",
+                                    bucket_name="react-cicd-cdk-artifacts",
                                     removal_policy=core.RemovalPolicy.DESTROY,
                                     block_public_access=s3.BlockPublicAccess.BLOCK_ALL
                                     )
@@ -41,7 +43,7 @@ class StaticSiteStack(core.Stack):
         )
 
         alias_configuration = cf.AliasConfiguration(
-            acm_cert_ref=certificate_arn,
+            acm_cert_ref=self.certificate_arn,
             names=[f"{env}.{domain}"],
             ssl_method=cf.SSLMethod.SNI,
             security_policy=cf.SecurityPolicyProtocol.TLS_V1_1_2016
@@ -76,7 +78,7 @@ class StaticSiteStack(core.Stack):
         hosted_zone = route53.HostedZone.from_hosted_zone_attributes(
             self,
             id="static-site-hosted-zone-id",
-            hosted_zone_id=hosted_zone_id,
+            hosted_zone_id=self.hosted_zone_id,
             zone_name=domain
         )
 

@@ -36,7 +36,11 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-      # - name: Test Environment Variables
-      #   run: echo $ENVIRONMENT
-      # - name: Package Front-End
-      #   run: npm run build
+      - name: Install AWS CDK
+        run: npm install -g aws-cdk
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+      - name: Install CDK Requirements
+        run: cd cdk && pip3 install -r requirements.txt
+      - name: cdk ls -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c hosted_zone_id=${{ secrets.AWS_HOSTED_ID }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }}
