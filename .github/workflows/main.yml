@@ -16,8 +16,6 @@ jobs:
       TESTING: ${{ true }}
     runs-on: ubuntu-latest
     steps:
-      - name: Test TESTING Variable
-        run: echo ${{env.TESTING}}
       - name: Set env to dev
         if: (contains(github.ref, 'feature') || contains(github.ref, 'master'))
         run: echo "::set-env name=ENVIRONMENT::dev"
@@ -28,6 +26,8 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "14.x"
+      - name: Install jq to parse outputs of cdk deploy
+        run: apt-get jq
       - name: Install Dependencies
         if: "!env.TESTING"
         run: npm install
@@ -51,3 +51,9 @@ jobs:
         run: cd cdk && pip3 install -r requirements.txt
       - name: Synthesize Cloud Formation Template
         run: cd cdk && cdk ls -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }}
+      # - name: Deploy Stack
+      #   run: cd cdk && cdk deploy -c environment=$ENVIRONMENT -c domain=${{ secrets.AWS_DOMAIN_NAME }} -c certificate_arn=${{ secrets.AWS_CERT_ARN }} --require-approval "never" --outputs-file cdk-deploy-output.json
+      - name: Set output variables
+        run: cd cdk && bash ./set_env_vars.sh
+      - name: Read Output Variables
+        run: cd cdk && echo $STACK && echo $STACK2
