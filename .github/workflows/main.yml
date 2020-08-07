@@ -53,7 +53,7 @@ jobs:
       - name: Set Output Variables
         run: cd cdk && bash ./set_env_vars.sh
       - name: View Output Variables
-        run: echo "$BUCKET" | tr -d '"' && echo echo "$DIST_ID" | tr -d '"' && echo "$ARTIFACT_BUCKET" | tr -d '"'
+        run: echo "$BUCKET" | tr -d '"' && echo "$DIST_ID" | tr -d '"' && echo "$ARTIFACT_BUCKET" | tr -d '"'
       - name: Build Deployment Package
         run: npm run build
       - name: Deploy To S3 Bucket
