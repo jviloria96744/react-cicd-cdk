@@ -16,16 +16,6 @@ class StaticSiteStack(core.Stack):
         # This can also be created as a separate stack and stored in the parameter store
         self.certificate_arn = self.node.try_get_context("certificate_arn")
 
-        # This is the bucket that will be used to store the artifacts for prod (and stg) deployments
-        artifact_bucket = s3.Bucket(self,
-                                    f"react-cicd-cdk-artifacts",
-                                    removal_policy=core.RemovalPolicy.DESTROY,
-                                    block_public_access=s3.BlockPublicAccess.BLOCK_ALL
-                                    )
-
-        core.CfnOutput(self, "artifactbucketname",
-                       value=artifact_bucket.bucket_name)
-
         bucket = s3.Bucket(self,
                            f"{environment}bucket",
                            website_index_document="index.html",

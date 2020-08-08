@@ -8,6 +8,7 @@ on:
       - "feature/**"
     paths:
       - "cdk/static_site_stack/**"
+      - "cdk/artifact_stack/**"
       - "cdk/app.py"
       - "cdk/set_env_vars.sh"
       - "src/**"
@@ -48,6 +49,8 @@ jobs:
         run: npm test
         env:
           CI: true
+      - name: Install jq to parse outputs of cdk deploy
+        run: sudo apt install jq
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -66,13 +69,20 @@ jobs:
           DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
           CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
         run: cd cdk && cdk ls -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN"
+      - name: Deploy Artifact Stack
+        env:
+        DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
+        CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
+        run: cd cdk && cdk deploy ArtifactStack -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
+      - name: Set Artifact Stack Bucket Name
+        run: cd cdk && echo "::set-env name=ARTIFACT_BUCKET::$(jq .ArtifactStack.artifactbucketname cdk-deploy-output.json)"
+      - name: Verify Artifact Stack Name
+        run: echo $ARTIFACT_BUCKET
       - name: Deploy Stack
         env:
           DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
           CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
-        run: cd cdk && cdk deploy -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
-      - name: Install jq to parse outputs of cdk deploy
-        run: sudo apt install jq
+        run: cd cdk && cdk deploy "StaticSiteStack*" -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
       - name: Set Output Variables
         run: cd cdk && bash ./set_env_vars.sh
       - name: Log Output Variables
@@ -83,7 +93,7 @@ jobs:
         run: aws s3 sync ./build s3://$BUCKET --delete
       - name: Store Build In Artifact Bucket
         if: env.ENVIRONMENT == 'stg'
-        run: aws s3 sync ./build s3://$ARTIFACT_BUCKET/Release-$RELEASE_VERSION/ --delete
+        run: aws s3 sync ./build s3://$(echo $ARTIFACT_BUCKET | tr -d '"')/Release-$RELEASE_VERSION/ --delete
       - name: Invalidate CloudFront Cache (stg & environment)
         if: env.ENVIRONMENT == 'stg'
         run: aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
