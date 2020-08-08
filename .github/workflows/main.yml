@@ -30,10 +30,10 @@ jobs:
       CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     steps:
       - name: Release Version Test
-        run: echo "Hello" && echo $RELEASE_VERSION
-      # - uses: actions/checkout@v1
-      #   with:
-      #     ref: "v0.1.0"
+        run: echo $RELEASE_VERSION
+      - uses: actions/checkout@v1
+        with:
+          ref: echo $RELEASE_VERSION
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "14.x"
