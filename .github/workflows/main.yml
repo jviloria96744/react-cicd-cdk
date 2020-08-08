@@ -29,7 +29,7 @@ jobs:
       DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
       CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     steps:
-      - name: Release Version Test
+      - name: Release Version
         run: echo $RELEASE_VERSION
       - uses: actions/checkout@v2
         with:
@@ -58,7 +58,7 @@ jobs:
         run: cd cdk && cdk deploy ArtifactStack -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
       - name: Set Artifact Stack Bucket Name
         run: cd cdk && echo "::set-env name=ARTIFACT_BUCKET::$(jq .ArtifactStack.artifactbucketname cdk-deploy-output.json)"
-      - name: Verify Artifact Stack Name
+      - name: Verify Artifact Stack Bucket Name
         run: echo $ARTIFACT_BUCKET
       - name: Deploy Static Site Stack
         run: cd cdk && cdk deploy "StaticSiteStack*" -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
