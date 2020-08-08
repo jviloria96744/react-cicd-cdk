@@ -1,4 +1,19 @@
+## React CI/CD Template
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+Additionally, this project contains a cdk directory containing a workflow that builds out `dev` and `stg` environments on AWS. These are AWS S3 buckets which sit behind CloudFront distributions that are tied to `dev.[domain name].com` and `stg.[domain name].com` respectively. There are a few things that need to be set up manually:
+
+- Custom Domain Name With Hosted Zone on AWS
+- SSL Certificate tied to `[dev stg *].[domain name].com`. I created this before hand because this was a first attempt at a CDK project and wasn't sure about automating the certificate creation process.
+- AWS User For GitHub Action Workflow. The permissions needed can be inferred through the cdk directory, but basically, creation of IAM roles, CloudFront Distributions, Route 53 Record Sets, S3 Buckets (put access as well). I may be missing some but add them as necessary.
+- The following secrets in GitHub need to be created
+  - AWS_ACCESS_KEY_ID / AWS_SECRET_KEY - programmatic user credentials of user created in previous step
+  - AWS_REGION - default region that resources will be created in (S3 Buckets)
+  - AWS_CERT_ARN - Certificate Arn of SSL Certificate, not necessary if creation of certificate is integrated in CDK deployment process
+  - AWS_DOMAIN_NAME - Custom Domain Name
+
+Below is simply the rest of the standard create-react-app README
 
 ## Available Scripts
 

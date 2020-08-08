@@ -1,6 +1,23 @@
-# Welcome to your CDK Python project!
+# React CI/CD CDK Template
 
-This is a blank project for Python development with CDK.
+This is a template project for Python development with CDK that is meant to deploy a static react app. The static site can be anything but the GitHub CI/CD workflow assumes a React App.
+
+The CDK command assumes two context variables
+
+- environment - This is `dev` or `stg`
+- domain - This is a custom domain that you need to purchase before hand and have a hosted zone set up on AWS
+
+The following resources are then built/deployed/set up
+
+- Static Site S3 Bucket - separate buckets are set up for each environment
+- CloudFront Distributions With OAI set for S3 Site Bucket - separate distributions are built for each environment and a SSL certificate (discussed in main project README) is used for HTTPS
+- Route 53 record created to tie `[dev stg *].[domain name]` to CloudFront Distributions
+- Artifact S3 Bucket is created for deployments to stg with the idea in mind that a prod deployment would simply take an artifact from that bucket to deploy
+
+Some elements that were added in addition to the standard cdk template
+
+- Output of cdk deploy is written to cdk-deploy-output.json, this is so assets can be synced to the correct S3 bucket or a cache invalidation can be created on the correct CloudFront distribution
+- `set_env_vars.sh` is a helper script to set environment variables based on the json output during the GitHub Action worklow
 
 The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
@@ -22,12 +39,6 @@ step to activate your virtualenv.
 
 ```
 $ source .env/bin/activate
-```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .env\Scripts\activate.bat
 ```
 
 Once the virtualenv is activated, you can install the required dependencies.
@@ -55,19 +66,3 @@ command.
 - `cdk docs` open CDK documentation
 
 Enjoy!
-
-## Notes for workflow
-
-Tentative Workflow
-
-- Set `env` conditionally on branch, make domain name a secret or set it unconditionally
-- Checkout
-- Install Node
-- `npm test`
-- Install Python
-- `pip3 install -r requirements.txt`
-- `cdk ls --context environment=[env] --context domain=[domain name]`
-- `cdk deploy --context environment=[env] --context domain=[domain name]`
-- `npm run build`
-- Sync build file to s3 bucket
-- conditional on `env`, invalidate cache
