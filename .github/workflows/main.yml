@@ -29,6 +29,9 @@ jobs:
       DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
       CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: $RELEASE_VERSION
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "14.x"
@@ -71,7 +74,7 @@ jobs:
     if: contains(github.ref, 'feature') && github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "14.x"
@@ -89,7 +92,7 @@ jobs:
       CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
       - name: Set env to dev
         if: contains(github.ref, 'master') || contains(github.base_ref, 'master')
         run: echo "::set-env name=ENVIRONMENT::dev"
