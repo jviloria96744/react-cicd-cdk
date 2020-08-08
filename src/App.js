@@ -18,7 +18,10 @@ function App() {
         >
           Learn React
         </a>
-        <p>This is a test feature</p>
+        <p>
+          This is a test feature that shouldn't be deployed until merging into
+          master
+        </p>
       </header>
     </div>
   );
