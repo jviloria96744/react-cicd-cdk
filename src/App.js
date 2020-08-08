@@ -18,7 +18,7 @@ function App() {
         >
           Learn React
         </a>
-        <p>This paragraph is going into the next release</p>
+        <p>This is a test of the second release</p>
       </header>
     </div>
   );
