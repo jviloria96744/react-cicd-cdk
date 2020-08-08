@@ -31,6 +31,9 @@ jobs:
 
   build:
     if: github.event_name == 'pull_request' || contains(github.ref, 'tags') || contains(github.ref, 'master')
+    env:
+      DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
+      CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -65,23 +68,14 @@ jobs:
       - name: Install CDK Requirements
         run: cd cdk && pip3 install -r requirements.txt
       - name: Synthesize Cloud Formation Template
-        env:
-          DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
-          CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
         run: cd cdk && cdk ls -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN"
       - name: Deploy Artifact Stack
-        env:
-        DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
-        CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
         run: cd cdk && cdk deploy ArtifactStack -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
       - name: Set Artifact Stack Bucket Name
         run: cd cdk && echo "::set-env name=ARTIFACT_BUCKET::$(jq .ArtifactStack.artifactbucketname cdk-deploy-output.json)"
       - name: Verify Artifact Stack Name
         run: echo $ARTIFACT_BUCKET
-      - name: Deploy Stack
-        env:
-          DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
-          CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
+      - name: Deploy Static Site Stack
         run: cd cdk && cdk deploy "StaticSiteStack*" -c environment=$ENVIRONMENT -c domain="$DOMAIN" -c certificate_arn="$CERT_ARN" --require-approval "never" --outputs-file cdk-deploy-output.json
       - name: Set Output Variables
         run: cd cdk && bash ./set_env_vars.sh
