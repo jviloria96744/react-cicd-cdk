@@ -1,6 +1,8 @@
 name: React CI/CD AWS CDK
 on:
   push:
+    tags:
+      - "v*.*.*"
     branches:
       - master
       - "feature/**"
@@ -27,16 +29,16 @@ jobs:
           CI: true
 
   build:
-    if: github.event_name == 'pull_request' || github.event_name == 'release' || contains(github.ref, 'master')
+    if: github.event_name == 'pull_request' || contains(github.ref, 'tags') || contains(github.ref, 'master')
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v1
       - name: Set env to dev
         if: contains(github.ref, 'master') || contains(github.base_ref, 'master')
         run: echo "::set-env name=ENVIRONMENT::dev"
-      - name: Set env to stg
-        if: github.event_name == 'release' || contains(github.base_ref, 'release')
-        run: echo "::set-env name=ENVIRONMENT::stg"
-      - uses: actions/checkout@v1
+      - name: Set env to stg and set release version from tag
+        if: contains(github.ref, 'tags')
+        run: echo "::set-env name=ENVIRONMENT::stg" && echo "::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})"
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "14.x"
@@ -79,6 +81,9 @@ jobs:
         run: npm run build
       - name: Deploy To S3 Bucket
         run: aws s3 sync ./build s3://$BUCKET --delete
-      - name: Invalidate CloudFront Cache (stg & prod Environments)
+      - name: Store Build In Artifact Bucket
+        if: env.ENVIRONMENT == 'stg'
+        run: aws s3 sync ./build s3://$BUCKET/Release-$RELEASE_VERSION/ --delete
+      - name: Invalidate CloudFront Cache (stg & environment)
         if: env.ENVIRONMENT == 'stg'
         run: aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
