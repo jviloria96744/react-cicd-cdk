@@ -10,4 +10,3 @@ function remove_quotes {
 
 echo "::set-env name=DIST_ID::$(remove_quotes $(jq .$STACK.distid $FILE))"
 echo "::set-env name=BUCKET::$(remove_quotes $(jq .$STACK.sitebucketname $FILE))"
-echo "::set-env name=ARTIFACT_BUCKET::$(remove_quotes $(jq .$STACK.artifactbucketname $FILE))"
