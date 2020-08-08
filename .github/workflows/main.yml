@@ -33,7 +33,7 @@ jobs:
         run: echo "Hello"
       - uses: actions/checkout@v1
         with:
-          ref: $RELEASE_VERSION
+          ref: "v0.1.0"
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "14.x"
