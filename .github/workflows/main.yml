@@ -83,7 +83,7 @@ jobs:
         run: aws s3 sync ./build s3://$BUCKET --delete
       - name: Store Build In Artifact Bucket
         if: env.ENVIRONMENT == 'stg'
-        run: aws s3 sync ./build s3://$BUCKET/Release-$RELEASE_VERSION/ --delete
+        run: aws s3 sync ./build s3://$ARTIFACT_BUCKET/Release-$RELEASE_VERSION/ --delete
       - name: Invalidate CloudFront Cache (stg & environment)
         if: env.ENVIRONMENT == 'stg'
         run: aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
