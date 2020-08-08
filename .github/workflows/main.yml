@@ -33,7 +33,7 @@ jobs:
         run: echo $RELEASE_VERSION
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.tag }}
+          ref: ${{ env.RELEASE_VERSION }}
       - uses: actions/setup-node@v2-beta
         with:
           node-version: "14.x"
@@ -69,7 +69,7 @@ jobs:
       - name: Deploy To S3 Bucket From Artifact Bucket
         run: aws s3 sync s3://$(echo $ARTIFACT_BUCKET | tr -d '"')/Release-$RELEASE_VERSION/ s3://$BUCKET --delete
       - name: Invalidate CloudFront Cache
-        if: env.ENVIRONMENT == 'stg'
+        if: env.ENVIRONMENT == 'prod'
         run: aws cloudfront create-invalidation --distribution-id $DIST_ID --paths "/*"
 
   test-only:
