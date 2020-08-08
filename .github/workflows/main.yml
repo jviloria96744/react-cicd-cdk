@@ -20,16 +20,14 @@ on:
         description: "Version to be deployed"
         required: true
 jobs:
-  env:
-    DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
-    CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
-
   prod-deployment:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     env:
       ENVIRONMENT: prod
       RELEASE_VERSION: ${{ github.event.inputs.tag }}
+      DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
+      CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     steps:
       - uses: actions/setup-node@v2-beta
         with:
@@ -86,6 +84,9 @@ jobs:
 
   build:
     if: (github.event_name == 'pull_request' || contains(github.ref, 'tags') || contains(github.ref, 'master')) && github.event_name != 'workflow_dispatch'
+    env:
+      DOMAIN: ${{ secrets.AWS_DOMAIN_NAME }}
+      CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
