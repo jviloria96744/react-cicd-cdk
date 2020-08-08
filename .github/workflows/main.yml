@@ -30,7 +30,7 @@ jobs:
       CERT_ARN: ${{ secrets.AWS_CERT_ARN }}
     steps:
       - name: Release Version Test
-        run: echo "Hello" && echo $RELEASE_VERSION
+        run: echo "Hello"
       - uses: actions/checkout@v1
         with:
           ref: $RELEASE_VERSION
